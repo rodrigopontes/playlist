@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Playlists de Sucesso do Rodrigo</title>
+  <style>
+    :root {
+      --azul: #0d1b2a;
+      --azul-claro: #1b2d45;
+      --laranja: #ff6f00;
+      --branco: #f8f9fa;
+      --cinza: #cccccc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--azul);
+      color: var(--branco);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--laranja);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--azul);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .playlist {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .track {
+      background-color: var(--azul-claro);
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      border-left: 8px solid var(--laranja);
+      font-size: 1.2rem;
+      font-weight: 500;
+      line-height: 1.4;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .track:hover {
+      transform: scale(1.03);
+      background-color: #234567;
+    }
+
+    .modal-bg {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 10;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .modal {
+      background-color: #ffffff;
+      color: #000000;
+      padding: 2rem;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .modal h2 {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 1.5rem;
+    }
+
+    .controls button {
+      background-color: var(--laranja);
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .controls button:hover {
+      background-color: #e66000;
+    }
+
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #444;
+      cursor: pointer;
+    }
+
+    footer {
+      background-color: #06111e;
+      color: var(--cinza);
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.5rem;
+      }
+
+      .track {
+        font-size: 1rem;
+        padding: 1.2rem;
+      }
+
+      .controls button {
+        padding: 0.5rem 0.7rem;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>Playlists de sucesso do Rodrigo</header>
+
+  <main>
+    <div class="playlist">
+      <div class="track" onclick="openPlayer(0)">🎵 I Don’t Want to Miss a Thing</div>
+      <div class="track" onclick="openPlayer(1)">🎵 Heaven</div>
+      <div class="track" onclick="openPlayer(2)">🎵 Nem Um Toque</div>
+      <div class="track" onclick="openPlayer(3)">🎵 I Should Have Known Better</div>
+      <div class="track" onclick="openPlayer(4)">🎵 Meu Mundo É Nada Mais</div>
+    </div>
+  </main>
+
+  <div id="modal-bg" class="modal-bg" onclick="closePlayer()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="close" onclick="closePlayer()">✖</button>
+      <h2 id="track-title">Título</h2>
+      <div class="controls">
+        <button onclick="prevTrack()">⏮️</button>
+        <button onclick="playTrack()">▶️</button>
+        <button onclick="pauseTrack()">⏸️</button>
+        <button onclick="stopTrack()">⏹️</button>
+        <button onclick="nextTrack()">⏭️</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Rodrigo. Todos os direitos reservados.
+  </footer>
+
+  <audio id="audio-player" preload="auto"></audio>
+
+  <script>
+    const playlist = [
+      { file: "i dont want to miss a thing official hd video.mp3", title: "I Don’t Want to Miss a Thing" },
+      { file: "heaven.mp3", title: "Heaven" },
+      { file: "nem um toque.mp3", title: "Nem Um Toque" },
+      { file: "i should have known better.mp3", title: "I Should Have Known Better" },
+      { file: "meu mundo e nada mais.mp3", title: "Meu Mundo É Nada Mais" }
+    ];
+
+    let currentIndex = 0;
+    const audio = document.getElementById('audio-player');
+
+    function openPlayer(index) {
+      currentIndex = index;
+      loadTrack(currentIndex);
+      document.getElementById('modal-bg').style.display = 'flex';
+    }
+
+    function loadTrack(index) {
+      const track = playlist[index];
+      audio.src = track.file;
+      document.getElementById('track-title').textContent = track.title;
+      audio.play();
+    }
+
+    function closePlayer() {
+      document.getElementById('modal-bg').style.display = 'none';
+      audio.pause();
+      audio.currentTime = 0;
+    }
+
+    function playTrack() {
+      audio.play();
+    }
+
+    function pauseTrack() {
+      audio.pause();
+    }
+
+    function stopTrack() {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+
+    function nextTrack() {
+      currentIndex = (currentIndex + 1) % playlist.length;
+      loadTrack(currentIndex);
+    }
+
+    function prevTrack() {
+      currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+      loadTrack(currentIndex);
+    }
+
+    // Toca automaticamente a próxima quando termina
+    audio.addEventListener('ended', () => {
+      nextTrack();
+    });
+  </script>
+</body>
+</html>
