@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Playlists de Sucesso do Rodrigo</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    :root {
+      --azul: #0d1b2a;
+      --azul-claro: #1b2d45;
+      --laranja: #ff6f00;
+      --branco: #f8f9fa;
+      --cinza: #cccccc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--azul);
+      color: var(--branco);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--laranja);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--azul);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .playlist {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .track {
+      background-color: var(--azul-claro);
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease-in-out, background-color 0.3s;
+      cursor: pointer;
+      border-left: 8px solid var(--laranja);
+      font-size: 1.2rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .track:hover {
+      transform: scale(1.03);
+      background-color: #234567;
+    }
+
+    .modal-bg {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      z-index: 10;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .modal {
+      background-color: #ffffff;
+      color: #000000;
+      padding: 2rem;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .modal h2 {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal audio {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .modal .close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #444;
+      cursor: pointer;
+    }
+
+    .download-button {
+      display: inline-block;
+      background-color: var(--laranja);
+      color: white;
+      padding: 0.7rem 1.2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .download-button:hover {
+      background-color: #e66000;
+    }
+
+    footer {
+      background-color: #06111e;
+      color: var(--cinza);
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.5rem;
+      }
+
+      .track {
+        font-size: 1rem;
+        padding: 1.2rem;
+      }
+
+      .modal h2 {
+        font-size: 1.3rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .download-button {
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>Playlists de sucesso do Rodrigo</header>
+
+  <main>
+    <div class="playlist">
+      <div class="track" onclick="openPlayer('i dont want to miss a thing official hd video.mp3', 'I Don’t Want to Miss a Thing')">🎵 I Don’t Want to Miss a Thing</div>
+      <div class="track" onclick="openPlayer('heaven.mp3', 'Heaven')">🎵 Heaven</div>
+      <div class="track" onclick="openPlayer('nem um toque.mp3', 'Nem Um Toque')">🎵 Nem Um Toque</div>
+      <div class="track" onclick="openPlayer('i should have known better.mp3', 'I Should Have Known Better')">🎵 I Should Have Known Better</div>
+      <div class="track" onclick="openPlayer('meu mundo e nada mais.mp3', 'Meu Mundo e Nada Mais')">🎵 Meu Mundo É Nada Mais</div>
+    </div>
+  </main>
+
+  <div id="modal-bg" class="modal-bg" hx-on="click: closePlayer()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="close" onclick="closePlayer()">✖</button>
+      <h2 id="modal-title">Título da Música</h2>
+      <audio id="modal-audio" controls autoplay>
+        Seu navegador não suporta o elemento de áudio.
+      </audio>
+      <br />
+      <a id="download-link" href="#" download class="download-button">⬇️ Baixar Música</a>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Rodrigo. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    function openPlayer(file, title) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-audio').src = file;
+      document.getElementById('download-link').href = file;
+      document.getElementById('modal-bg').style.display = 'flex';
+    }
+
+    function closePlayer() {
+      const modal = document.getElementById('modal-bg');
+      const audio = document.getElementById('modal-audio');
+      audio.pause();
+      modal.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
